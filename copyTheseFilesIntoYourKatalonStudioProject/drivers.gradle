@@ -1,0 +1,29 @@
+task deleteJarsInDriversDir(type: Delete) {
+  delete fileTree('Drivers') {
+    include '**/*.jar'
+  }
+}
+
+import java.nio.file.Path
+import java.nio.file.Paths
+def downloadFile = { remoteUrl, localDir ->
+  Path outFile = Paths.get(localDir).resolve("${remoteUrl.tokenize('/')[-1]}")
+  outFile.toFile().withOutputStream { out ->
+    new URL(remoteUrl).withInputStream { from ->
+      out << from
+    }
+  }
+}
+
+task downloadJarsIntoDriversDir {
+    doLast {
+      downloadFile('http://central.maven.org/maven2/ru/yandex/qatools/ashot/ashot/1.5.4/ashot-1.5.4.jar', 'Drivers/')
+      downloadFile('https://github.com/kazurayam/Materials/releases/download/0.60.0/Materials-0.60.0.jar', 'Drivers/')
+    }
+}
+
+task drivers {
+  dependsOn 'deleteJarsInDriversDir'
+  dependsOn 'downloadJarsIntoDriversDir'
+  tasks.findByName('downloadJarsIntoDriversDir').mustRunAfter 'deleteJarsInDriversDir'
+}
