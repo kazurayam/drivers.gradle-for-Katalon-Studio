@@ -27,3 +27,5 @@ task drivers {
   dependsOn 'downloadJarsIntoDriversDir'
   tasks.findByName('downloadJarsIntoDriversDir').mustRunAfter 'deleteJarsInDriversDir'
 }
+
+defaultTasks 'drivers'
